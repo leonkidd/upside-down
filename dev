@@ -1,4 +1,13 @@
+拦截修改方案
 1.NS2, AgentJ
-2.路由转发，IP转发
+2.路由转发，IP转发,(自己的机器做成网关，带路由等功能)
 3.!HTTP代理
-4.RIP!, OSPF, BGP
+4.路由协议RIP!, OSPF, BGP
+5.linux netfilter, NDIS, ACL
+6.路由上/防火墙  设置策略 URL IP  跳转
+7.DHCP
+
+
+可行方案
+1.代理服务器
+2.Netfilter
