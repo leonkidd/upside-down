@@ -5,10 +5,12 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import org.apache.http.HttpException;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.impl.DefaultBHttpServerConnection;
-import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpCoreContext;
 import org.apache.http.protocol.HttpProcessor;
@@ -38,21 +40,21 @@ public class Main implements HttpRequestHandler {
 
 			HttpProcessor httpproc = HttpProcessorBuilder.create().build();
 
-//			HttpCoreContext context = HttpCoreContext.create();
-			HttpContext context = new BasicHttpContext(null);
+			HttpCoreContext context = HttpCoreContext.create();
+//			HttpContext context = new BasicHttpContext(null);
 
 			// Bind connection objects to the execution context
-			context.setAttribute(HTTP_IN_CONN, inconn);
+			//context.setAttribute(HTTP_IN_CONN, inconn);
 			//context.setAttribute(HTTP_OUT_CONN, outconn);
 
 			// Set up incoming request handler
 			UriHttpRequestHandlerMapper reqistry = new UriHttpRequestHandlerMapper();
-			reqistry.register("*.gif", new Main());
+			reqistry.register("*", new Main());
 
 			// Set up the HTTP service
 			HttpService httpService = new HttpService(httpproc, reqistry);
 			httpService.handleRequest(inconn, context);
-
+			client_socket.close();
 		}
 		proxy_socket.close();
 	}
@@ -60,7 +62,10 @@ public class Main implements HttpRequestHandler {
 	public void handle(HttpRequest request, HttpResponse response,
 			HttpContext context) throws HttpException, IOException {
 		// Send request
-		System.out.println(context);
+		String uri = request.getRequestLine().getUri();
+		HttpHost target = new HttpHost(uri);
+		CloseableHttpResponse target_response = HttpClients.createDefault().execute(target, request);
+		System.out.println(target_response);
 	}
 
 }
