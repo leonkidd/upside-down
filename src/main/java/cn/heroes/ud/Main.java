@@ -1,14 +1,11 @@
 package cn.heroes.ud;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import javax.imageio.ImageIO;
-
+import org.apache.http.ConnectionClosedException;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
@@ -60,6 +57,7 @@ public class Main implements HttpRequestHandler {
 				HttpService httpService = new HttpService(httpproc, reqistry);
 				httpService.handleRequest(inconn, context);
 			} catch (UnknownHostException e) {
+			} catch (ConnectionClosedException e) {
 			} catch (Exception e) {
 				e.printStackTrace();
 			} finally {
@@ -75,7 +73,7 @@ public class Main implements HttpRequestHandler {
 		Header[] header = request.getHeaders("Host");
 		String host = header[0].getValue();
 		HttpHost target = new HttpHost(host);
-		System.out.println(host);
+		// System.out.println(host);
 
 		String uri = request.getRequestLine().getUri();
 
@@ -84,17 +82,37 @@ public class Main implements HttpRequestHandler {
 
 		response.setStatusLine(targetResponse.getStatusLine());
 		response.setHeaders(targetResponse.getAllHeaders());
+
 		HttpEntity entity = targetResponse.getEntity();
-		if (uri.endsWith(".png")) {
+		if (isImage(uri)) {
 			// TODO do sth fun with png
+			System.out.println(uri);
 			byte[] bs = EntityUtils.toByteArray(entity);
-			System.out.println(bs.length);
-			ByteArrayInputStream bais = new ByteArrayInputStream(bs);
-			BufferedImage image = ImageIO.read(bais);
+			try {
+				bs = Fun.transform(bs);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			// TODO with image
 			entity = new ByteArrayEntity(bs);
 		}
 		response.setEntity(entity);
+	}
+
+	// private static final String[] imageSubfix = { "bmp", "gif", "ico",
+	// "jpeg",
+	// "jpg", "png", "tga", "tiff" };
+	private static final String[] imageSubfix = { "bmp", "gif", "jpeg", "jpg",
+			"png" };
+
+	public static boolean isImage(String uri) {
+		String low = uri.toLowerCase();
+		for (String subfix : imageSubfix) {
+			if (low.endsWith("." + subfix)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }
