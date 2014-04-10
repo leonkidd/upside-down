@@ -1,0 +1,36 @@
+package cn.heroes.ud;
+
+import java.net.InetAddress;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.protocol.HttpRequestHandler;
+import org.apache.http.util.EntityUtils;
+
+public class Main2 implements HttpRequestHandler {
+
+	private static final String HTTP_IN_CONN = "http.proxy.in-conn";
+	private static final String HTTP_OUT_CONN = "http.proxy.out-conn";
+	private static final String HTTP_CONN_KEEPALIVE = "http.proxy.conn-keepalive";
+
+	/**
+	 * @param args
+	 * @throws Exception
+	 */
+	public static void main(String[] args) throws Exception {
+//		String uri = "http://heroes.cn:9000/";
+//		HttpGet get = new HttpGet(uri);
+//		CloseableHttpClient client = HttpClients.createDefault();
+//		CloseableHttpResponse response = client.execute(get);
+//		HttpEntity entity = response.getEntity();
+//		System.out.println(EntityUtils.toString(entity));
+		
+		InetAddress ia = InetAddress.getByName("heroes.cn");
+		System.out.println(ia);
+	}
+
+}
