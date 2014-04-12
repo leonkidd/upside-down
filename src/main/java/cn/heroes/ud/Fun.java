@@ -1,9 +1,11 @@
 package cn.heroes.ud;
 
-import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
 import java.io.File;
-import java.io.IOException;
+
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriter;
 
 import org.apache.commons.imaging.ImageFormats;
 import org.apache.commons.imaging.ImageReadException;
@@ -16,9 +18,16 @@ public class Fun {
 	 * @throws Exception
 	 * @throws ImageReadException
 	 */
+	/**
+	 * @param args
+	 * @throws ImageReadException
+	 * @throws Exception
+	 */
 	public static void main(String[] args) throws ImageReadException, Exception {
-		File file = new File("image", "a.gif");
-		BufferedImage image = Imaging.getBufferedImage(file);
+		File file = new File("image", "heart-elika.jpg");
+		BufferedImage image = ImageIO.read(file);
+
+		// BufferedImage image = Imaging.getBufferedImage(file);
 
 		int width = image.getWidth();
 		int height = image.getHeight();
@@ -32,9 +41,9 @@ public class Fun {
 				target.setRGB(width - 1 - col, row, rgb);
 			}
 		}
-
-		Imaging.writeImage(target, new File("image", "b.gif"),
-				ImageFormats.GIF, null);
+		File output = new File("image", "target.jpg");
+		ImageIO.write(target, "JPEG", output);
+//		Imaging.writeImage(target, output, ImageFormats.JPEG, null);
 	}
 
 	public static byte[] transform(byte[] bs) throws Exception {

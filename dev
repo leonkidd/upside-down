@@ -6,8 +6,10 @@
 5.linux netfilter, NDIS, ACL
 6.路由上/防火墙  设置策略 URL IP  跳转
 7.DHCP
+8.DNS
 
 
 可行方案
 1.代理服务器
 2.Netfilter
+3.DNS
