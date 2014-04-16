@@ -28,18 +28,24 @@ import org.apache.http.util.EntityUtils;
 
 public class Main implements HttpRequestHandler {
 
-	private static final String HTTP_IN_CONN = "http.proxy.in-conn";
-	private static final String HTTP_OUT_CONN = "http.proxy.out-conn";
-	private static final String HTTP_CONN_KEEPALIVE = "http.proxy.conn-keepalive";
-
-	/**
-	 * @param args
-	 * @throws Exception
-	 */
 	public static void main(String[] args) throws Exception {
-		ServerSocket proxy_socket = new ServerSocket(8888);
+		ServerSocket proxy_socket = new ServerSocket(8080);
 		Socket client_socket = null;
 		while ((client_socket = proxy_socket.accept()) != null) {
+			Waiter a = new Waiter(client_socket);
+			a.run();
+		}
+		proxy_socket.close();
+	}
+
+	private static class Waiter extends Thread {
+		private Socket client_socket = null;
+
+		public Waiter(Socket socket) {
+			this.client_socket = socket;
+		}
+
+		public void run() {
 			try {
 				DefaultBHttpServerConnection inconn = new DefaultBHttpServerConnection(
 						8 * 1024);
@@ -61,10 +67,14 @@ public class Main implements HttpRequestHandler {
 			} catch (Exception e) {
 				e.printStackTrace();
 			} finally {
-				client_socket.close();
+				if (client_socket != null)
+					try {
+						client_socket.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 			}
 		}
-		proxy_socket.close();
 	}
 
 	public void handle(HttpRequest request, HttpResponse response,
@@ -84,17 +94,17 @@ public class Main implements HttpRequestHandler {
 		response.setHeaders(targetResponse.getAllHeaders());
 
 		HttpEntity entity = targetResponse.getEntity();
-		if (isImage(uri)) {
-			// TODO do sth fun with png
-			System.out.println(uri);
-			byte[] bs = EntityUtils.toByteArray(entity);
-			try {
+		try {
+			if (isImage(uri) || entity != null) {
+				// TODO do sth fun with png
+				System.out.println(uri);
+				byte[] bs = EntityUtils.toByteArray(entity);
 				bs = Fun.transform(bs);
-			} catch (Exception e) {
-				e.printStackTrace();
+				// TODO with image
+				entity = new ByteArrayEntity(bs);
 			}
-			// TODO with image
-			entity = new ByteArrayEntity(bs);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		response.setEntity(entity);
 	}
